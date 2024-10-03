@@ -1,0 +1,49 @@
+Output a self-contained .jsx React+Tailwind+Shadcn app that accomplishes the following task:
+
+<task>
+Create a digital watch. In the digital watch there should be 3 tabs: watch, stopwatch, settings. So the watch has 2 modes corresponding to watch tab and stopwatch tab and a settings tab.
+
+Tab names which can be clicked to select the tabs will be displayed at the bottom of the screen.
+
+Following are the characteristics of each tab
+
+Settings tab: -
+Settings tab will have a single field which can be used to toggle 24 hours time format. Default format will be 12 hours.
+
+Watch tab: -
+1. In watch tab, at the top, there will be region where time is displayed.
+2. Below the timer, an add alarm button will be present with text "Add Alaram". When the button is clicked, the text of the button changes to "Add" and fields show after it in the same row. In the first field the user enters the time in current date format (which can be changed in settings). Thus the time is entered in hh:mm:ss format and if the format is 12 hours format, an additional dropdown is shown for selecting AM and PM value for alarm time. When user clicks the "Add" button: (i) a new alarm is added if the values in form make a valid time and the fields disappear, (ii) the text of button is set back to "Add Alaram".
+3. The added alarms are shown in a list below the alarm form as a list item. These are sorted by their corresponding time.
+4. The alarm list items have time written at left side and a toggle button on the right side. These list items should take full width.
+5. Toggle button on an alarm can be used to activate and inactivate an alarm. If an alarm is active and clock reaches its time, then the color of the clock switches between green and black every half second and this continues for 5 seconds, after which color of the clock is reset to black.
+6. Only the region containing alarms is scrollable.
+
+
+Stopwatch mode: -
+1. It has a watch which shows time in hh:mm:ss.
+2. Stopwatch is either running or paused or stopped. When its stopped, the time is always 00:00:00 and below in the control region, there is only start button.
+3. When start button is clicked, the watch starts running and time starts. When watch is running, start button changes to stop and a pause button and split button appear in the control region.
+4. When pause button is clicked, the stopwatch is paused and the pause button changes to resume button. Clicking resume button resumes the watch and changes the resume button back to pause button.
+5. When stop button is clicked the watch is stopped and time is set back to 00:00:00.
+6. When split button is clicked, the current time in the stopwatch is appended to the list of times below.
+
+
+Styling instructions: -
+Both stopwatch timer and watch time will use shadows for 3d effect and the time at the top will use a monospace font.
+Every toggle buttons shadow is grey when its off and it is green when it is on.
+The app should use some light shades of green for background for theming various elements.
+
+Additional instructions: -
+Both watch an the timer values should be based on actual time elapsed and should be synced with current time. For stopwatch this means that the time should be calculated every second based on the time difference between start time and current time and the next update should be scheduled accordingly to when the current second will end. For the watch, the time should be updated to match current time and the next update should be scheduled at the end of current second.
+
+</task>
+
+Make sure to use React in your response. You may use components from Shadcn using “@/components” like so: import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"; You are not allowed to use any other dependencies or external assets.
+
+You can define multiple sub-components if necessary, but export the final app as a default function component (export default function App()...).
+
+Use modern React idioms like hooks.
+Use Tailwind for styling.
+Use prettier formatting (2-space tab width, semicolons, etc).
+Ensure mobile responsiveness; the app should work with the sm breakpoint in tailwind.
+Restrict your output to around 500 lines.
