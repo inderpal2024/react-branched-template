@@ -20,18 +20,18 @@ Watch tab: -
 
 
 Stopwatch mode: -
-1. It has a watch which shows time in hh:mm:ss.
-2. Stopwatch is either running or paused or stopped. When its stopped, the time is always 00:00:00 and below in the control region, there is only start button.
-3. When start button is clicked, the watch starts running and time starts. When watch is running, start button changes to stop and a pause button and split button appear in the control region.
+1. It has a watch at the top which shows time in hh:mm:ss, which is followed by a row of buttons to control the stopwatch and finally an ordered list of spit times.
+2. Stopwatch is either running or paused or stopped. When its stopped, the time is always 00:00:00, split time list is empty and below it, there is only start button.
+3. When start button is clicked, the watch starts running and time starts. When watch is running, start button changes to stop and a pause button and split button appear beside it in the control region.
 4. When pause button is clicked, the stopwatch is paused and the pause button changes to resume button. Clicking resume button resumes the watch and changes the resume button back to pause button.
-5. When stop button is clicked the watch is stopped and time is set back to 00:00:00.
+5. When stop button is clicked the watch is stopped and time is set back to 00:00:00 and split time list is cleared.
 6. When split button is clicked, the current time in the stopwatch is appended to the list of times below.
 
 
 Styling instructions: -
 Both stopwatch timer and watch time will use shadows for 3d effect and the time at the top will use a monospace font.
-Every toggle buttons shadow is grey when its off and it is green when it is on.
-The app should use some light shades of green for background for theming various elements.
+Every toggle button shadow is grey when its off and it is green when it is on.
+The app should use some shades of blue for theming various elements. Background shades should be light in color.
 
 Additional instructions: -
 Both watch an the timer values should be based on actual time elapsed and should be synced with current time. For stopwatch this means that the time should be calculated every second based on the time difference between start time and current time and the next update should be scheduled accordingly to when the current second will end. For the watch, the time should be updated to match current time and the next update should be scheduled at the end of current second.
