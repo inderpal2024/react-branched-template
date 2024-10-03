@@ -1,172 +1,108 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Button } from "@/components/ui/button";
-import { Switch } from "@/components/ui/switch";
-import { Input } from "@/components/ui/input";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuLabel } from "@/components/ui/dropdown-menu";
+import { Button, Card, CardContent, Switch } from "@/components/ui";
+import { cn } from "@/lib/utils";
 
-function App() {
-  const [timeFormat24, setTimeFormat24] = useState(false);
-  const [currentTime, setCurrentTime] = useState(new Date());
+const formatTime = (date, is24HourFormat) => {
+  return date.toLocaleTimeString('en-US', {
+    hour12: !is24HourFormat,
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+  });
+};
+
+function DigitalWatch() {
+  const [currentTab, setCurrentTab] = useState('watch');
+  const [is24Hour, setIs24Hour] = useState(false);
+  const [time, setTime] = useState(new Date());
   const [alarms, setAlarms] = useState([]);
-  const [alarmInput, setAlarmInput] = useState({ time: '', period: 'AM' });
-  const [stopwatchTime, setStopwatchTime] = useState(0);
-  const [isRunning, setIsRunning] = useState(false);
-  const [paused, setPaused] = useState(true);
-  const [laps, setLaps] = useState([]);
-  const [splitTime, setSplitTime] = useState(0);
+  const [alarmTime, setAlarmTime] = useState('');
+  const [amPm, setAmPm] = useState('AM');
 
   useEffect(() => {
     const timer = setInterval(() => {
-      setCurrentTime(new Date());
-      if (isRunning) {
-        setStopwatchTime(Date.now() - splitTime);
-      }
+      setTime(new Date());
     }, 1000);
     return () => clearInterval(timer);
-  }, [isRunning, splitTime]);
-
-  useEffect(() => {
-    const checkAlarms = () => {
-      const now = currentTime.toLocaleTimeString('en-US', { hour12: !timeFormat24 });
-      alarms.forEach(alarm => {
-        if (alarm.time === now && alarm.active) {
-          // Here you would implement the alarm visual feedback
-          console.log('Alarm ringing for:', alarm.time);
-        }
-      });
-    };
-    checkAlarms();
-  }, [currentTime, alarms, timeFormat24]);
+  }, []);
 
   const addAlarm = () => {
-    if (alarmInput.time) {
-      const [hours, minutes, seconds] = alarmInput.time.split(':').map(Number);
-      let time = new Date();
-      time.setHours(timeFormat24 ? hours : (hours % 12) + (alarmInput.period === 'PM' ? 12 : 0));
-      time.setMinutes(minutes);
-      time.setSeconds(seconds);
-      setAlarms([...alarms, { time: time.toLocaleTimeString('en-US', { hour12: !timeFormat24 }), active: true }].sort((a, b) => new Date('1970/01/01 ' + a.time) - new Date('1970/01/01 ' + b.time)));
-      setAlarmInput({ time: '', period: 'AM' });
-    }
+    if (!alarmTime) return;
+    const [hours, minutes, seconds] = alarmTime.split(':').map(Number);
+    const alarmDate = new Date();
+    alarmDate.setHours(is24Hour ? hours : hours % 12 + (amPm === 'PM' ? 12 : 0));
+    alarmDate.setMinutes(minutes);
+    alarmDate.setSeconds(seconds);
+    setAlarms(prev => [...prev, { time: alarmDate, active: true }].sort((a, b) => a.time - b.time));
+    setAlarmTime('');
   };
 
-  const formatTime = (date) => date.toLocaleTimeString('en-US', { hour12: !timeFormat24, hour: '2-digit', minute: '2-digit', second: '2-digit' });
-
-  const startStopwatch = () => {
-    setIsRunning(true);
-    setPaused(false);
-    setSplitTime(Date.now() - stopwatchTime);
-  };
-
-  const stopStopwatch = () => {
-    setIsRunning(false);
-    setPaused(true);
-    setStopwatchTime(0);
-    setLaps([]);
-  };
-
-  const pauseResumeStopwatch = () => {
-    setPaused(!paused);
-    if (!paused) {
-      setSplitTime(Date.now() - stopwatchTime);
-    } else {
-      setStopwatchTime(Date.now() - splitTime);
-    }
-  };
-
-  const split = () => {
-    if (isRunning && !paused) {
-      setLaps([...laps, stopwatchTime]);
-    }
+  const toggleAlarm = (index) => {
+    const newAlarms = [...alarms];
+    newAlarms[index].active = !newAlarms[index].active;
+    setAlarms(newAlarms);
   };
 
   return (
-    <div className="flex flex-col h-screen bg-green-50">
-      <Tabs defaultValue="watch" className="flex-grow">
-        <TabsList className="bg-green-100">
-          <TabsTrigger value="watch">Watch</TabsTrigger>
-          <TabsTrigger value="stopwatch">Stopwatch</TabsTrigger>
-          <TabsTrigger value="settings">Settings</TabsTrigger>
-        </TabsList>
-        <TabsContent value="watch">
-          <div className="flex flex-col items-center justify-center flex-grow">
-            <div className="text-4xl font-mono mb-4 shadow-lg">{formatTime(currentTime)}</div>
-            <Button onClick={() => setAlarmInput({ ...alarmInput, time: '' })}>
-              {alarmInput.time ? "Add" : "Add Alarm"}
-            </Button>
-            {alarmInput.time === '' && (
-              <div className="mt-2 space-x-2">
-                <Input 
-                  type="time" 
-                  value={alarmInput.time} 
-                  onChange={(e) => setAlarmInput({ ...alarmInput, time: e.target.value })} 
-                  className="w-32"
-                />
-                {!timeFormat24 && (
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="outline">{alarmInput.period}</Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent>
-                      <DropdownMenuItem onClick={() => setAlarmInput({ ...alarmInput, period: 'AM' })}>AM</DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => setAlarmInput({ ...alarmInput, period: 'PM' })}>PM</DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                )}
-              </div>
-            )}
-            <div className="mt-4 overflow-y-auto">
+    <Card className="bg-green-50 h-full sm:h-auto">
+      <CardContent className="p-4 flex flex-col h-full">
+        <div className="text-4xl font-mono mb-4 text-center shadow-lg">
+          {formatTime(time, is24Hour)}
+        </div>
+        <div className="flex-grow overflow-y-auto">
+          {currentTab === 'watch' && (
+            <>
+              <Button onClick={() => setAlarmTime('')}>Add Alarm</Button>
+              {alarmTime !== '' && (
+                <div className="mt-2 flex">
+                  <input 
+                    type="time" 
+                    value={alarmTime} 
+                    onChange={(e) => setAlarmTime(e.target.value)} 
+                    className="mr-2"
+                  />
+                  {!is24Hour && (
+                    <select value={amPm} onChange={(e) => setAmPm(e.target.value)}>
+                      <option>AM</option>
+                      <option>PM</option>
+                    </select>
+                  )}
+                  <Button onClick={addAlarm}>Add</Button>
+                </div>
+              )}
               {alarms.map((alarm, index) => (
-                <div key={index} className="flex justify-between w-full p-2 bg-green-200 mb-2 last:mb-0">
-                  <span>{alarm.time}</span>
-                  <Switch checked={alarm.active} onCheckedChange={(checked) => {
-                    const newAlarms = [...alarms];
-                    newAlarms[index].active = checked;
-                    setAlarms(newAlarms);
-                  }} />
+                <div key={index} className="flex justify-between items-center mt-2">
+                  <span>{formatTime(alarm.time, is24Hour)}</span>
+                  <Switch 
+                    checked={alarm.active} 
+                    onCheckedChange={() => toggleAlarm(index)} 
+                    className={cn("shadow-lg", alarm.active ? "shadow-green-500" : "shadow-gray-500")}
+                  />
                 </div>
               ))}
-            </div>
-          </div>
-        </TabsContent>
-        <TabsContent value="stopwatch">
-          <div className="flex flex-col items-center justify-center flex-grow">
-            <div className="text-4xl font-mono mb-4 shadow-lg">
-              {new Date(stopwatchTime).toISOString().substr(11, 8)}
-            </div>
-            <div>
-              {!isRunning ? (
-                <Button onClick={startStopwatch}>Start</Button>
-              ) : (
-                <>
-                  <Button onClick={paused ? pauseResumeStopwatch : stopStopwatch}>
-                    {paused ? 'Resume' : 'Stop'}
-                  </Button>
-                  <Button onClick={paused ? startStopwatch : pauseResumeStopwatch}>
-                    {paused ? 'Start' : 'Pause'}
-                  </Button>
-                  <Button onClick={split}>Split</Button>
-                </>
-              )}
-            </div>
-            <div className="mt-4">
-              {laps.map((lap, idx) => (
-                <div key={idx}>{new Date(lap).toISOString().substr(11, 8)}</div>
-              ))}
-            </div>
-          </div>
-        </TabsContent>
-        <TabsContent value="settings">
-          <div className="p-4">
-            <Switch checked={timeFormat24} onCheckedChange={setTimeFormat24}>
-              24 Hour Format
-            </Switch>
-          </div>
-        </TabsContent>
-      </Tabs>
-    </div>
+            </>
+          )}
+        </div>
+        <div className="mt-4 flex justify-around">
+          {['watch', 'stopwatch', 'settings'].map(tab => (
+            <Button 
+              key={tab} 
+              variant={currentTab === tab ? 'default' : 'outline'} 
+              onClick={() => setCurrentTab(tab)}
+            >
+              {tab.charAt(0).toUpperCase() + tab.slice(1)}
+            </Button>
+          ))}
+        </div>
+      </CardContent>
+    </Card>
   );
 }
 
-export default App;
+export default function App() {
+  return (
+    <div className="flex justify-center items-center h-screen bg-green-100">
+      <DigitalWatch />
+    </div>
+  );
+}
